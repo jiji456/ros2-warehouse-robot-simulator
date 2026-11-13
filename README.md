@@ -4,6 +4,8 @@ A portfolio project demonstrating a small autonomous warehouse-robot workflow: n
 
 > **Scope and safety:** This is an educational software simulation, not a production robotics stack. It does not control motors or physical equipment, and its simulated sensors and obstacle checks are not safety-rated.
 
+**Live dashboard demo:** [Open the ROS 2 Warehouse Robot Simulator dashboard](https://d0947125-f4f3-40b7-92b7-031a0af01d5a-00-19h70wb8btmbn.sisko.replit.dev/)
+
 ## What it demonstrates
 
 - **Robot behavior:** step-based navigation through a configurable warehouse grid.
