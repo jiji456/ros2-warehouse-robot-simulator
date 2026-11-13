@@ -1,8 +1,8 @@
 # ROS 2 Warehouse Robot Simulator
 
-A portfolio project demonstrating a small autonomous warehouse-robot workflow: navigate a grid-based warehouse, reach a pickup point, deliver an item to a drop-off point, and publish structured telemetry. The Python simulation core can run from a CLI or be explored through an interactive local web dashboard; an optional ROS 2 node publishes simulator events for inspection.
+A portfolio project demonstrating a small autonomous warehouse-robot workflow: navigate a grid-based warehouse, reach a pickup point, deliver an item to a drop-off point, and publish structured telemetry.
 
-> **Scope and safety:** This is an educational software simulation, not a production robotics stack. It does not control motors or physical equipment, and its simulated sensors and obstacle checks are not safety-rated. See [Safety and limitations](docs/safety.md).
+> **Scope and safety:** This is an educational software simulation, not a production robotics stack. It does not control motors or physical equipment, and its simulated sensors and obstacle checks are not safety-rated.
 
 ## What it demonstrates
 
@@ -50,9 +50,34 @@ python -m pip install -r web_dashboard/requirements.txt
 uvicorn app:app --app-dir web_dashboard --reload
 ```
 
-Open <http://127.0.0.1:8000>. Use **Start mission** to animate the robot, **Step** to advance one simulation tick, **Pause mission** to pause, or the reset icon to restart. The dashboard API docs are at <http://127.0.0.1:8000/docs>.
+Open <http://127.0.0.1:8000>. Use **Start mission** to animate the robot, **Step** to advance one simulation tick, **Pause mission** to pause, or the reset icon to restart. The dashboard API docs are available at <http://127.0.0.1:8000/docs>.
 
 The dashboard is a local demo interface; do not expose its API to untrusted networks or connect it to physical robot controls. See [dashboard setup and limitations](web_dashboard/README.md).
+
+### Run the dashboard on Replit
+
+The web dashboard can run on Replit without ROS 2. Import this GitHub repository into Replit, then configure the Replit workflow or deployment to use the repository root as the working directory.
+
+Install the simulator package and dashboard dependencies as the build/install command:
+
+```bash
+python -m pip install -e ./warehouse_bot
+python -m pip install -r web_dashboard/requirements.txt
+```
+
+Use this as the run command. Replit provides the `PORT` environment variable; bind Uvicorn to `0.0.0.0` so the web preview/deployment can reach the app:
+
+```bash
+uvicorn app:app --app-dir web_dashboard --host 0.0.0.0 --port ${PORT:-8000}
+```
+
+If configuring a `.replit` file, the run command can be set like this:
+
+```toml
+run = "uvicorn app:app --app-dir web_dashboard --host 0.0.0.0 --port ${PORT:-8000}"
+```
+
+Open the web preview or published app URL after the server starts. ROS 2 is not required for the dashboard; the ROS 2 node is a separate optional runtime. The dashboard API is intended for demos—do not expose it to untrusted users or connect it to physical robot controls.
 
 Save CLI telemetry to a JSON Lines file with `warehouse-sim --jsonl telemetry.jsonl`, or limit the run with `warehouse-sim --max-steps 100`. Each telemetry record includes `sequence`, `timestamp`, `position`, `task_id`, `status`, `target`, `sensors`, and `detail`.
 
