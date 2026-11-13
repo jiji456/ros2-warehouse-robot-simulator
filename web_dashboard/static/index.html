@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101619">
+  <meta name="description" content="Interactive web dashboard for the ROS 2 warehouse robot simulator.">
+  <title>Warehouse Robotics · Control Room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/dashboard.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Warehouse Robotics dashboard home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span>field<span class="brand-light">works</span><small>ROBOTICS LAB</small></span>
+      </a>
+      <div class="topbar-center"><span class="live-dot"></span> SIMULATION ENVIRONMENT <span class="divider">/</span> WAREHOUSE 01</div>
+      <a class="repo-link" href="https://github.com/jiji456/ros2-warehouse-robot-simulator" target="_blank" rel="noreferrer">SOURCE CODE <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main>
+      <section class="heading-row">
+        <div>
+          <p class="eyebrow">AUTONOMOUS MOBILE ROBOT · DEMO 001</p>
+          <h1>Warehouse <span>mission control</span></h1>
+          <p class="subtitle">Monitor navigation, task execution, and simulated sensor telemetry.</p>
+        </div>
+        <div class="connection"><span class="connection-icon">⌁</span><span><strong>SIM CONNECTED</strong><small>LOCAL API · ROS-READY</small></span></div>
+      </section>
+
+      <section class="dashboard-grid" aria-label="Robot simulation dashboard">
+        <article class="panel map-panel">
+          <div class="panel-header">
+            <div><p class="panel-kicker">LIVE ENVIRONMENT</p><h2>Warehouse floor</h2></div>
+            <div class="map-dimensions" id="mapDimensions">— × — <span>GRID</span></div>
+          </div>
+          <div class="map-wrap"><div id="warehouseMap" class="warehouse-map" role="img" aria-label="Warehouse grid map"></div></div>
+          <div class="map-footer">
+            <div class="legend"><span><i class="legend-robot"></i> ROBOT</span><span><i class="legend-target"></i> GOAL</span><span><i class="legend-route"></i> ROUTE</span><span><i class="legend-obstacle"></i> OBSTACLE</span></div>
+            <span class="coordinates" id="coordinates">X 01&nbsp;&nbsp; Y 01</span>
+          </div>
+        </article>
+
+        <aside class="side-column">
+          <article class="panel mission-panel">
+            <div class="panel-header compact"><div><p class="panel-kicker">ACTIVE MISSION</p><h2>Task overview</h2></div><span class="status-pill" id="statusPill"><i></i> READY</span></div>
+            <div class="mission-id"><span class="tiny-label">MISSION ID</span><strong id="taskId">ORDER-001</strong></div>
+            <div class="progress-block"><div class="progress-label"><span>MISSION PROGRESS</span><strong id="progressText">0 / 2 WAYPOINTS</strong></div><div class="progress-track"><span id="progressBar"></span></div></div>
+            <div class="waypoint-list">
+              <div class="waypoint" id="pickupWaypoint"><span class="waypoint-marker pickup-marker">A</span><span><small>01 · PICKUP</small><strong>Collect package</strong></span><span class="waypoint-state" id="pickupState">PENDING</span></div>
+              <div class="waypoint" id="dropoffWaypoint"><span class="waypoint-marker dropoff-marker">B</span><span><small>02 · DROP-OFF</small><strong>Deliver package</strong></span><span class="waypoint-state" id="dropoffState">PENDING</span></div>
+            </div>
+            <div class="controls">
+              <button id="runButton" class="button button-primary"><span aria-hidden="true">▶</span> Start mission</button>
+              <button id="stepButton" class="button button-secondary">Step <span aria-hidden="true">→</span></button>
+              <button id="resetButton" class="button button-icon" aria-label="Reset simulation" title="Reset simulation">↺</button>
+            </div>
+          </article>
+
+          <article class="panel telemetry-panel">
+            <div class="panel-header compact"><div><p class="panel-kicker">ROBOT TELEMETRY</p><h2>System status</h2></div><span class="telemetry-live"><i></i> LIVE</span></div>
+            <div class="telemetry-grid">
+              <div class="metric"><span class="tiny-label">POSITION</span><strong id="positionMetric">—, —</strong><small>GRID COORDINATES</small></div>
+              <div class="metric"><span class="tiny-label">CURRENT TASK</span><strong id="taskMetric">—</strong><small id="taskSubmetric">NO ACTIVE TASK</small></div>
+            </div>
+            <div class="sensor-heading"><span class="tiny-label">RANGE SENSORS</span><span>CELLS TO OBSTACLE</span></div>
+            <div class="sensor-grid">
+              <div class="sensor"><span>N</span><strong id="sensorNorth">—</strong></div>
+              <div class="sensor"><span>E</span><strong id="sensorEast">—</strong></div>
+              <div class="sensor"><span>S</span><strong id="sensorSouth">—</strong></div>
+              <div class="sensor"><span>W</span><strong id="sensorWest">—</strong></div>
+            </div>
+          </article>
+        </aside>
+      </section>
+
+      <section class="panel event-panel">
+        <div class="event-title"><div><p class="panel-kicker">EVENT STREAM</p><h2>Mission activity</h2></div><span id="eventCount">EVENT 000</span></div>
+        <div class="event-row"><span class="event-indicator" id="eventIndicator"></span><time id="eventTime">--:--:--</time><span id="eventStatus" class="event-status">READY</span><span id="eventDetail">Waiting for mission start.</span></div>
+      </section>
+      <p class="safety-note"><span>ⓘ</span> Educational simulation only. This dashboard does not control physical robot hardware and is not a safety-rated system.</p>
+    </main>
+    <footer><span>FIELDWORKS ROBOTICS LAB</span><span>PYTHON · ROS 2 · SIMULATION</span><span>PORTFOLIO PROJECT <b>·</b> 2026</span></footer>
+  </div>
+</body>
+</html>

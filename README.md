@@ -1,6 +1,6 @@
 # ROS 2 Warehouse Robot Simulator
 
-A portfolio project demonstrating a small autonomous warehouse-robot workflow: navigate a grid-based warehouse, reach a pickup point, deliver an item to a drop-off point, and publish structured telemetry. The simulation core is written in Python and can run without ROS 2; an optional ROS 2 node publishes simulator events for inspection.
+A portfolio project demonstrating a small autonomous warehouse-robot workflow: navigate a grid-based warehouse, reach a pickup point, deliver an item to a drop-off point, and publish structured telemetry. The Python simulation core can run from a CLI or be explored through an interactive local web dashboard; an optional ROS 2 node publishes simulator events for inspection.
 
 > **Scope and safety:** This is an educational software simulation, not a production robotics stack. It does not control motors or physical equipment, and its simulated sensors and obstacle checks are not safety-rated. See [Safety and limitations](docs/safety.md).
 
@@ -11,6 +11,7 @@ A portfolio project demonstrating a small autonomous warehouse-robot workflow: n
 - **Task execution:** pickup and drop-off waypoints with task status transitions.
 - **Sensor simulation:** idealized cardinal range readings for nearby obstacles and boundaries.
 - **Telemetry:** timestamped JSON events written to the terminal or a JSON Lines file.
+- **Web dashboard:** interactive floor map, robot route, mission progress, sensor readings, and controls to run, single-step, pause, or reset the simulation.
 - **ROS 2 integration:** optional `rclpy` node publishing telemetry on `/warehouse/telemetry` as `std_msgs/msg/String`.
 - **Quality practices:** ROS-independent core logic and Python unit tests.
 
@@ -20,14 +21,15 @@ A portfolio project demonstrating a small autonomous warehouse-robot workflow: n
 GridWorld + simulated range sensors
               ↓
 WarehouseSimulator ──→ BFS path planner
-        │
-        ├── CLI → stdout / JSONL file
+        │                        │
+        ├── CLI → stdout / JSONL │
+        ├── FastAPI → browser dashboard
         └── ROS 2 adapter → /warehouse/telemetry
 ```
 
 The simulator and planner do not depend on ROS 2, which makes the core logic easier to run and test. Read the [architecture notes](docs/architecture.md) for the runtime flow and telemetry fields.
 
-## Quick start (Python only)
+## Quick start (Python CLI)
 
 Python 3.9 or later is recommended. From the repository root:
 
@@ -38,19 +40,21 @@ python -m pip install -e ./warehouse_bot
 warehouse-sim
 ```
 
-Save telemetry to a JSON Lines file:
+## Interactive web dashboard
+
+Install the web API dependencies and launch the local dashboard:
 
 ```bash
-warehouse-sim --jsonl telemetry.jsonl
+python -m pip install -e ./warehouse_bot
+python -m pip install -r web_dashboard/requirements.txt
+uvicorn app:app --app-dir web_dashboard --reload
 ```
 
-Limit the simulation run:
+Open <http://127.0.0.1:8000>. Use **Start mission** to animate the robot, **Step** to advance one simulation tick, **Pause mission** to pause, or the reset icon to restart. The dashboard API docs are at <http://127.0.0.1:8000/docs>.
 
-```bash
-warehouse-sim --max-steps 100
-```
+The dashboard is a local demo interface; do not expose its API to untrusted networks or connect it to physical robot controls. See [dashboard setup and limitations](web_dashboard/README.md).
 
-Each telemetry record includes `sequence`, `timestamp`, `position`, `task_id`, `status`, `target`, `sensors`, and `detail`.
+Save CLI telemetry to a JSON Lines file with `warehouse-sim --jsonl telemetry.jsonl`, or limit the run with `warehouse-sim --max-steps 100`. Each telemetry record includes `sequence`, `timestamp`, `position`, `task_id`, `status`, `target`, `sensors`, and `detail`.
 
 ## Run with ROS 2
 
@@ -82,19 +86,11 @@ The tests cover path planning around obstacles, blocked destinations, dynamic ob
 ## Repository structure
 
 ```text
-warehouse_bot/
-├── launch/                 # ROS 2 launch entry point
-├── resource/               # ament package marker
-├── test/                   # standard-library unit tests
-├── warehouse_bot/
-│   ├── cli.py               # standalone command-line runner
-│   ├── models.py            # points, tasks, and sensor readings
-│   ├── planner.py           # BFS shortest-path planner
-│   ├── ros_node.py          # ROS 2 telemetry publisher
-│   ├── simulator.py         # task execution and event generation
-│   └── world.py             # grid and simulated sensors
-├── package.xml
-└── setup.py
+warehouse_bot/              # ROS 2 package and simulator core
+web_dashboard/               # FastAPI API and browser dashboard
+├── app.py
+├── requirements.txt
+└── static/                   # HTML, CSS, JavaScript UI
 
 docs/
 ├── architecture.md
@@ -111,4 +107,4 @@ docs/
 
 ## Skills shown
 
-Python · ROS 2 (`rclpy`) · BFS path planning · robotics simulation · sensor modeling · task-state logic · JSON telemetry · unit testing · technical documentation
+Python · ROS 2 (`rclpy`) · FastAPI · JavaScript · HTML/CSS · BFS path planning · robotics simulation · sensor modeling · task-state logic · JSON telemetry · unit testing · technical documentation
